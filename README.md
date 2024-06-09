@@ -1,7 +1,7 @@
-Role Name
+WIP - Ansible role K8s
 =========
 
-A brief description of the role goes here.
+Install k8s
 
 Requirements
 ------------
