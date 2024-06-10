@@ -21,8 +21,6 @@
     - kubelet
     - kubeadm
     - kubectl
-    - fish
-    - neovim
     - netcat
     - curl
     - python3-pip
