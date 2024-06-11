@@ -12,7 +12,7 @@
     gpgcheck: true
     gpgkey: https://pkgs.k8s.io/csore:/stable:/v{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
     baseurl: https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/rpm/
-    enabled: no
+    enabled: yes
 
 - name: install packages
   ansible.builtin.yum:
