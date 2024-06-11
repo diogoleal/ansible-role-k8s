@@ -10,19 +10,19 @@
     name: kubernetes
     description: K8S repo
     gpgcheck: true
-    gpgkey: https://pkgs.k8s.io/csore:/stable:/v1.26/rpm/repodata/repomd.xml.key
-    baseurl: https://pkgs.k8s.io/core:/stable:/v1.26/rpm/
+    gpgkey: https://pkgs.k8s.io/csore:/stable:/v{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
+    baseurl: https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/rpm/
+    enabled: no
 
 - name: install packages
   ansible.builtin.yum:
     name:
     - wget
-    - nc
+    - netcat
     - curl
     - kubelet
     - kubeadm
     - kubectl
-    - netcat
     state: present
 
 - name: sudo systemctl enable --now kubelet
