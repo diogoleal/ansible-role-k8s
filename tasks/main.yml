@@ -5,13 +5,6 @@
   ansible.builtin.shell:
     cmd: swapoff -a
 
-# - name: # This overwrites any existing configuration in /etc/yum.repos.d/kubernetes.repo
-#   template:
-#     src: kubernetes.repo.j2
-#     dest: /etc/yum.repos.d/kubernetes.repo
-#     owner: root
-#     group: root
-
 - name: Add kubernetes repository
   ansible.builtin.yum_repository:
     name: kubernetes
@@ -24,7 +17,6 @@
   ansible.builtin.yum:
     name:
     - wget
-    - tc
     - nc
     - curl
     - kubelet
