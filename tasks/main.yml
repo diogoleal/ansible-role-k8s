@@ -5,25 +5,32 @@
   ansible.builtin.shell:
     cmd: swapoff -a
 
-- name: # This overwrites any existing configuration in /etc/yum.repos.d/kubernetes.repo
-  template:
-    src: kubernetes.repo.j2
-    dest: /etc/yum.repos.d/kubernetes.repo
-    owner: root
-    group: root
+# - name: # This overwrites any existing configuration in /etc/yum.repos.d/kubernetes.repo
+#   template:
+#     src: kubernetes.repo.j2
+#     dest: /etc/yum.repos.d/kubernetes.repo
+#     owner: root
+#     group: root
 
-- name: sudo dnf install -y wget tc nc kubelet kubeadm kubectl --disableexcludes=kubernetes
+- name: Add kubernetes repository
+  ansible.builtin.yum_repository:
+    name: kubernetes
+    description: K8S repo
+    gpgcheck: true
+    gpgkey: https://pkgs.k8s.io/csore:/stable:/v1.26/rpm/repodata/repomd.xml.key
+    baseurl: https://pkgs.k8s.io/core:/stable:/v1.26/rpm/
+
+- name: install packages
   ansible.builtin.yum:
     name:
     - wget
     - tc
     - nc
+    - curl
     - kubelet
     - kubeadm
     - kubectl
     - netcat
-    - curl
-    - python3-pip
     state: present
 
 - name: sudo systemctl enable --now kubelet
