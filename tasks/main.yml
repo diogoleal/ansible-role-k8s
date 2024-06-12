@@ -5,14 +5,27 @@
   ansible.builtin.shell:
     cmd: swapoff -a
 
+# - name: Add kubernetes repository
+#   ansible.builtin.yum_repository:
+#     name: kubernetes
+#     description: K8S repo
+#     gpgcheck: true
+#     baseurl: https://packages.kubernetes.io/core:/stable:/v{{ kubernetes_version }}/rpm/
+#     gpgkey: https://packages.kubernetes.io/csore:/stable:/v{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
+#     enabled: yes
+
 - name: Add kubernetes repository
-  ansible.builtin.yum_repository:
-    name: kubernetes
-    description: K8S repo
-    gpgcheck: true
-    baseurl: https://packages.kubernetes.io/core:/stable:/v{{ kubernetes_version }}/rpm/
-    gpgkey: https://packages.kubernetes.io/csore:/stable:/v{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
-    enabled: yes
+  ansible.builtin.shell:
+    cmd: |
+    cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+    [kubernetes]
+    name=Kubernetes
+    baseurl=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
+    enabled=1
+    gpgcheck=1
+    gpgkey=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
+    exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+    EOF
 
 - name: install packages
   ansible.builtin.yum:
