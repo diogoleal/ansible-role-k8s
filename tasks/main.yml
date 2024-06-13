@@ -5,27 +5,12 @@
   ansible.builtin.shell:
     cmd: swapoff -a
 
-# - name: Add kubernetes repository
-#   ansible.builtin.yum_repository:
-#     name: kubernetes
-#     description: K8S repo
-#     gpgcheck: true
-#     baseurl: https://packages.kubernetes.io/core:/stable:/v{{ kubernetes_version }}/rpm/
-#     gpgkey: https://packages.kubernetes.io/csore:/stable:/v{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
-#     enabled: yes
-
-- name: Add kubernetes repository
-  ansible.builtin.shell:
-    cmd: |
-    cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
-    [kubernetes]
-    name=Kubernetes
-    baseurl=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
-    enabled=1
-    gpgcheck=1
-    gpgkey=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
-    exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
-    EOF
+- name: Add kubernets repository
+  template:
+    src: kubernetes.repo.j2
+    dest: /etc/yum.repos.d/kubernetes.repo
+    owner: root
+    group: root
 
 - name: install packages
   ansible.builtin.yum:
@@ -101,42 +86,3 @@
     state: present
     reload: true
 
-#
-# net.bridge.bridge-nf-call-iptables  = 1
-# net.bridge.bridge-nf-call-ip6tables = 1
-# net.ipv4.ip_forward                 = 1
-
-
-
-# Apply sysctl params without reboot
-# sysctl --system
-# lsmod | grep br_netfilter
-# lsmod | grep overlay
-
-# systemctl enable firewalld.service
-# systemctl start firewalld.service
-#
-# firewall-cmd --permanent --add-port=6443/tcp --add-port=2379-2380/tcp --add-port=10250/tcp \
-# --add-port=30000-32767/tcp --add-port=10251-10255/tcp --add-port=8472/udp --permanent
-# firewall-cmd --permanent --add-masquerade
-# firewall-cmd --reload
-#
-#
-# cat <<EOF | tee /etc/containerd/config.toml
-# [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-#    SystemdCgroup = true
-# EOF
-#
-# systemctl enable containerd.service
-# systemctl start containerd.service
-#
-# kubeadm init --kubernetes-version=1.26.11
-#
-# mkdir -p $HOME/.kube
-# cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-# chown $(id -u):$(id -g) $HOME/.kube/config
-
-# Alternatively, if you are the root user, you can run:
-# export KUBECONFIG=/etc/kubernetes/admin.conf
-
-# kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
