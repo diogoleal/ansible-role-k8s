@@ -12,12 +12,9 @@
     owner: root
     group: root
 
-- name: install packages
+- name: install kubernetes packages
   ansible.builtin.yum:
     name:
-    - wget
-    - netcat
-    - curl
     - kubelet
     - kubeadm
     - kubectl
