@@ -5,13 +5,6 @@
   ansible.builtin.shell:
     cmd: swapoff -a
 
-# yum install yum-utils -y
-# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-#
-# # containerd - https://github.com/containerd/containerd
-# # runc
-# dnf install containerd runc -y
-
 - name: Add repository
   ansible.builtin.yum_repository:
     name: docker-ce-stable
@@ -28,7 +21,7 @@
     - containerd
     state: present
 
-- name: Add kubernets repository
+- name: kubernets repository
   template:
     src: kubernetes.repo.j2
     dest: /etc/yum.repos.d/kubernetes.repo
@@ -97,6 +90,15 @@
     state: present
     reload: true
 
+# sudo firewall-cmd --permanent --add-port=6443/tcp
+# sudo firewall-cmd --permanent --add-port=2379-2380/tcp
+# sudo firewall-cmd --permanent --add-port=10250/tcp
+# sudo firewall-cmd --permanent --add-port=10251/tcp
+# sudo firewall-cmd --permanent --add-port=10259/tcp
+# sudo firewall-cmd --permanent --add-port=10257/tcp
+# sudo firewall-cmd --permanent --add-port=179/tcp
+# sudo firewall-cmd --permanent --add-port=4789/udp
+
 - name: open ports 2379-2380/tcp
   ansible.posix.firewalld:
     port: 2379-2380/tcp
@@ -138,6 +140,16 @@
     path: /etc/containerd/config.toml
     state: absent
 
+- name: create containerd/config.toml
+  ansible.builtin.shell:
+    cmd: containerd config default > /etc/containerd/config.toml
+
+- name: Replace a value to SystemdCgroup
+  ansible.builtin.lineinfile:
+    path: /etc/containerd/config.toml
+    search_string: 'SystemdCgroup = false'
+    line: SystemdCgroup = true
+
 - name: start containerd
   ansible.builtin.systemd_service:
     name: containerd
@@ -153,12 +165,3 @@
 - name: kubeadmin init
   ansible.builtin.shell:
     cmd: kubeadm init --kubernetes-version=latest
-
-# mkdir -p $HOME/.kube
-# cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-# chown $(id -u):$(id -g) $HOME/.kube/config
-#
-# # Alternatively, if you are the root user, you can run:
-# # export KUBECONFIG=/etc/kubernetes/admin.conf
-#
-# kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
